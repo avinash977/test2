@@ -1,5 +1,6 @@
 import express from 'express';
 import { getAllUsers, loginUser, registerUser } from '../controllers/authController.js';
+import userAuth from '../middlewares/isAuthenticated.js';
 
 const router = express.Router();
 
@@ -10,6 +11,8 @@ router.post('/register',registerUser);
 router.post('/login',loginUser);
 
 //Get all users || METHOD: GET || PATH: /api/v1/auth/users
-router.get('/users',getAllUsers);
+router.get('/users',userAuth,getAllUsers);
+
+
 
 export default router;

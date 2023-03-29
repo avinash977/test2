@@ -1,7 +1,7 @@
 import User from "../models/userModel.js";
-import { comparePassword, hashPassword } from "../utils/authHelper.js";
 import JWT from "jsonwebtoken";
 import ErrorHandler from "../utils/errorHandler.js";
+import bcrypt from "bcryptjs";
 
 /*
 @desc    Register a new user
@@ -27,19 +27,23 @@ export const registerUser = async (req, res,next) => {
 
 
         // create new user
-        const hashedPassword = await hashPassword(password)
+        // const hashedPassword = await hashPassword(password)
         const user = await User.create({
             name,
             lastName,
             email,
-            password: hashedPassword,
-            location
+            password,
+            location,
         });
+
+        // create token
+        const token=user.createJWT();
 
         res.status(201).json({
             success: true,
             data: user,
             message: `${user.name} Registered Successfully 💃`,
+            token
         });
 
     } catch (error) {
@@ -63,28 +67,31 @@ export const loginUser = async (req, res,next) => {
         }
 
         // check for existing user
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email }).select("+password")
 
         if (!user) {
             return next(new ErrorHandler("Invalid Credentials", 400))
         }
 
-        const match = comparePassword(password, user.password)
+        // match password using bcrypt.js 
+        const match = await user.comparePassword(password)
 
         if (!match) {
             return next(new ErrorHandler("Invalid Credentials", 400))
 
         }
 
+        user.password = undefined;
+
         // create token
-        const token = await JWT.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" })
+        const token = user.createJWT();
 
         res.status(200).json({
-            success: true, message: "Login Successfull", user: {
-                name: user.name,
-                email: user.email,
-                location: user.location,
-            }, token
+            success: true, 
+            message: "Login Successfull",
+            user,
+            token
+
         })
 
 

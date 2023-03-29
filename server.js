@@ -1,12 +1,15 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import colors from 'colors';
-import connectDB from './config/db.js';
 import morgan from 'morgan';
-import authRoutes from './routes/authRoutes.js';
 import cors from 'cors';
+import path from 'path';
+
+// import modules from files
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
 import errorMiddleware from './middlewares/Error.js';
-// import errorMiddleware from './middlewares/errorMiddleware.js';
+import userRoutes from './routes/userRoutes.js';
 
 
 const app = express();
@@ -30,13 +33,14 @@ if (process.env.DEV_MODE === 'development') {
 
 // configure routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/user', userRoutes);
 
 
 // error errorMiddleware
 app.use(errorMiddleware);
 
 app.get('/', (req, res) => {
-    res.send(`<h1> 🐰 Welcome to Tech Abhi Job Portal 💓</h1>`);
+    res.sendFile(path.join(path.resolve(), 'index.html'));
 });
 
 app.listen(port, () => {
