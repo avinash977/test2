@@ -10,7 +10,7 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import errorMiddleware from './middlewares/Error.js';
 import userRoutes from './routes/userRoutes.js';
-
+import jobRoutes from './routes/jobsRoutes.js';
 
 const app = express();
 
@@ -31,9 +31,11 @@ if (process.env.DEV_MODE === 'development') {
     app.use(morgan('dev'));
 }
 
+
 // configure routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/job', jobRoutes);
 
 
 // error errorMiddleware

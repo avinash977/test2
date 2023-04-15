@@ -16,7 +16,7 @@ const userAuth = (req, res, next) => {
         next();
         
     } catch (error) {
-        next(new Error('Please login to access this route'));
+        next(new Error('Invalid credentials'));
     }
 };
 
